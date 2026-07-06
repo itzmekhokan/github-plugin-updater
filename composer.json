@@ -1,9 +1,9 @@
 {
-    "name": "itzmekhokan/wp-github-plugin-updater",
+    "name": "itzmekhokan/github-plugin-updater",
     "description": "Give any GitHub-hosted WordPress plugin wp.org-style update notices and one-click updates in the admin, without hosting on wp.org. Public and private/organization repositories supported.",
     "type": "library",
     "keywords": ["wordpress", "plugin", "updater", "github", "self-update", "composer"],
-    "homepage": "https://github.com/itzmekhokan/wp-github-plugin-updater",
+    "homepage": "https://github.com/itzmekhokan/github-plugin-updater",
     "license": "GPL-2.0-or-later",
     "authors": [
         {

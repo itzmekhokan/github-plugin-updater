@@ -1,4 +1,4 @@
-# wp-github-plugin-updater
+# github-plugin-updater
 
 Give any **GitHub-hosted WordPress plugin** the same "update available" notice
 and one-click update experience as wp.org — without publishing to wp.org.
@@ -18,7 +18,7 @@ admin, so site owners update with one click like any wp.org plugin.
 ## Install
 
 ```bash
-composer require itzmekhokan/wp-github-plugin-updater
+composer require itzmekhokan/github-plugin-updater
 ```
 
 ## Usage
