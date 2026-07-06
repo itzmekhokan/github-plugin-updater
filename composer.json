@@ -1,0 +1,38 @@
+{
+    "name": "itzmekhokan/wp-github-plugin-updater",
+    "description": "Give any GitHub-hosted WordPress plugin wp.org-style update notices and one-click updates in the admin, without hosting on wp.org. Public and private/organization repositories supported.",
+    "type": "library",
+    "keywords": ["wordpress", "plugin", "updater", "github", "self-update", "composer"],
+    "homepage": "https://github.com/itzmekhokan/wp-github-plugin-updater",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Khokan Sardar",
+            "email": "itzmekhokan@gmail.com",
+            "homepage": "https://github.com/itzmekhokan"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "brain/monkey": "^2.6",
+        "phpunit/phpunit": "^9.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Itzmekhokan\\GitHubPluginUpdater\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Itzmekhokan\\GitHubPluginUpdater\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
