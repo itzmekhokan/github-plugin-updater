@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>github-plugin-updater — wp.org-style updates for GitHub-hosted WordPress plugins</title>
+<meta name="description" content="A Composer library that gives any GitHub-hosted WordPress plugin the same one-click update experience as wp.org. Works with public, private, and organization repositories.">
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+
+<meta property="og:title" content="github-plugin-updater">
+<meta property="og:description" content="One-click WordPress plugin updates straight from GitHub releases — public, private, and organization repos.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://itzmekhokan.github.io/github-plugin-updater/">
+
+<style>
+  :root{
+    --bg:#070b14; --bg2:#0b1220; --panel:#0f1729; --panel2:#131d33;
+    --line:#1e2b47; --line2:#26365a;
+    --ink:#eaf0ff; --muted:#93a1c4; --dim:#64749b;
+    --cyan:#22d3ee; --green:#34d399; --violet:#a78bfa;
+    --code:#060a12; --amber:#fbbf24;
+    --grad:linear-gradient(120deg,var(--cyan),var(--green));
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+  a{color:var(--cyan);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+  code,pre{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+  code{background:#111c33;color:#bfe9ff;padding:1.5px 6px;border-radius:5px;font-size:.88em;border:1px solid var(--line)}
+  h1,h2,h3{letter-spacing:-.4px}
+
+  /* ---- Hero ---- */
+  header.hero{position:relative;overflow:hidden;text-align:center;padding:78px 0 62px;
+    background:radial-gradient(900px 400px at 50% -8%,rgba(34,211,238,.14),transparent 60%),
+               radial-gradient(700px 380px at 84% 8%,rgba(52,211,153,.12),transparent 55%),
+               var(--bg)}
+  header.hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;opacity:.18;mask-image:radial-gradient(600px 300px at 50% 0,#000,transparent 80%)}
+  .hero .inner{position:relative;z-index:1}
+  .hero img.mark{width:96px;height:96px;filter:drop-shadow(0 10px 30px rgba(34,211,238,.35))}
+  .hero h1{font-size:58px;font-weight:800;margin:20px 0 4px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .tag{font-size:20px;color:var(--ink);max-width:660px;margin:6px auto 6px;font-weight:500}
+  .hero .sub{font-size:15px;color:var(--muted);max-width:620px;margin:0 auto 26px}
+  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+  .badges img{height:22px}
+  .cta{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:11px;font-weight:600;font-size:15px;transition:transform .12s,box-shadow .12s;border:1px solid transparent}
+  .btn.primary{background:var(--grad);color:#04121a;box-shadow:0 8px 24px rgba(34,211,238,.25)}
+  .btn.ghost{background:rgba(255,255,255,.04);color:var(--ink);border-color:var(--line2)}
+  .btn:hover{text-decoration:none;transform:translateY(-2px)}
+  .s{color:var(--amber)}
+
+  /* ---- Nav ---- */
+  nav.sticky{position:sticky;top:0;z-index:99;background:rgba(7,11,20,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav.sticky .wrap{display:flex;gap:22px;align-items:center;height:52px;overflow-x:auto}
+  nav.sticky .brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--ink);white-space:nowrap}
+  nav.sticky .brand img{width:22px;height:22px}
+  nav.sticky a.lnk{font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap}
+  nav.sticky a.lnk:hover{color:var(--cyan);text-decoration:none}
+  nav.sticky a.star{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink);padding:6px 13px;border-radius:9px;font-weight:600;font-size:13.5px}
+  nav.sticky a.star:hover{border-color:var(--cyan);text-decoration:none}
+
+  /* ---- Sections ---- */
+  section{padding:60px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .eyebrow{font-size:12.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin:0 0 10px}
+  section h2{font-size:30px;margin:0 0 8px}
+  section .lede{color:var(--muted);margin:0 0 30px;font-size:17px;max-width:680px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+  .feat{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:15px;padding:22px;transition:border-color .15s,transform .15s}
+  .feat:hover{border-color:var(--line2);transform:translateY(-2px)}
+  .feat h3{margin:0 0 6px;font-size:16.5px}
+  .feat p{margin:0;color:var(--muted);font-size:14.5px}
+  .feat .dot{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,rgba(34,211,238,.18),rgba(52,211,153,.18));border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:14px}
+
+  pre{background:var(--code);color:#dce8ff;padding:18px 20px;border-radius:13px;overflow:auto;font-size:13.5px;line-height:1.7;margin:0;border:1px solid var(--line)}
+  pre + pre{margin-top:12px}
+  pre .c{color:#5f7096}
+  pre .k{color:var(--green)}
+  pre .s2{color:var(--amber)}
+  pre .p{color:var(--violet)}
+  .codewrap{position:relative}
+  .codewrap .lbl{position:absolute;top:10px;right:12px;font-size:11px;color:var(--dim);font-family:"SF Mono",monospace}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;counter-reset:step}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 20px 20px;position:relative}
+  .step::before{counter-increment:step;content:counter(step);position:absolute;top:-14px;left:20px;width:30px;height:30px;border-radius:9px;background:var(--grad);color:#04121a;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .step h3{margin:8px 0 6px;font-size:16px}
+  .step p{margin:0;color:var(--muted);font-size:14px}
+
+  table.tbl{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:13px;overflow:hidden}
+  table.tbl th,table.tbl td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+  table.tbl th{background:var(--panel2);font-weight:700;color:var(--ink)}
+  table.tbl tr:last-child td{border-bottom:0}
+  table.tbl td code{white-space:nowrap}
+
+  .pill{font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:20px;display:inline-block}
+  .pill.done{background:rgba(52,211,153,.14);color:var(--green);border:1px solid rgba(52,211,153,.3)}
+  .pill.plan{background:rgba(167,139,250,.14);color:var(--violet);border:1px solid rgba(167,139,250,.3)}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  .note{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.28);border-radius:12px;padding:14px 18px;color:#f5dea5;font-size:14px;margin-top:18px}
+  .note b{color:var(--amber)}
+
+  .cta-band{background:linear-gradient(120deg,rgba(34,211,238,.1),rgba(52,211,153,.08));border:1px solid var(--line2);border-radius:18px;padding:40px 28px;text-align:center}
+  .cta-band p{margin:0 auto 22px;max-width:560px;font-size:16.5px;color:var(--ink)}
+
+  footer{padding:44px 0 60px;text-align:center;color:var(--dim);font-size:14px;border-top:1px solid var(--line)}
+  footer a{color:var(--muted)}
+
+  @media(max-width:660px){
+    .split{grid-template-columns:1fr}
+    .hero h1{font-size:42px}
+    .hero .tag{font-size:18px}
+    section h2{font-size:25px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner wrap">
+    <img class="mark" src="assets/icon.svg" alt="github-plugin-updater logo">
+    <h1>github-plugin-updater</h1>
+    <p class="tag">wp.org-style "update available" notices and one-click updates for any <strong>GitHub-hosted</strong> WordPress plugin.</p>
+    <p class="sub">A Composer library you drop into your own plugin — public, private, and organization repositories. No wp.org listing, nothing for site owners to install.</p>
+    <div class="badges">
+      <img src="https://img.shields.io/badge/php-%3E%3D7.4-777BB4?logo=php&logoColor=white" alt="PHP >= 7.4">
+      <img src="https://img.shields.io/badge/WordPress-5.8%2B-21759B?logo=wordpress&logoColor=white" alt="WordPress 5.8+">
+      <img src="https://img.shields.io/badge/composer-itzmekhokan%2Fgithub--plugin--updater-885630?logo=composer&logoColor=white" alt="Composer package">
+      <img src="https://img.shields.io/badge/license-GPL--2.0--or--later-34d399" alt="License GPL-2.0-or-later">
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#install">Get started</a>
+      <a class="btn ghost" href="https://github.com/itzmekhokan/github-plugin-updater">View on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<nav class="sticky">
+  <div class="wrap">
+    <span class="brand"><img src="assets/icon.svg" alt="">github-plugin-updater</span>
+    <a class="lnk" href="#why">Why</a>
+    <a class="lnk" href="#features">Features</a>
+    <a class="lnk" href="#install">Install</a>
+    <a class="lnk" href="#config">Config</a>
+    <a class="lnk" href="#private">Private repos</a>
+    <a class="lnk" href="#how">How it works</a>
+    <a class="lnk" href="#roadmap">Roadmap</a>
+    <a class="star" href="https://github.com/itzmekhokan/github-plugin-updater"><span class="s">★</span> Star on GitHub</a>
+  </div>
+</nav>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap">
+    <p class="eyebrow">The problem</p>
+    <h2>Ship from GitHub, update like wp.org</h2>
+    <p class="lede">Composer VCS repositories can <em>install</em> a GitHub plugin — but updating still means a developer running <code>composer update</code> over SSH. Site owners get no update badge, no changelog, no one-click button.</p>
+    <div class="split">
+      <div>
+        <p style="color:var(--muted);margin-top:0">This library flips that around. It checks your GitHub <strong>releases</strong> (or tags) at runtime and surfaces available updates <strong>directly in the WordPress admin</strong> — the exact same experience your users already know from the plugin screen.</p>
+        <p style="color:var(--muted)">Everything happens inside the plugin you already ship. There is no companion plugin to install and nothing to configure at the site level beyond a token for private repos.</p>
+      </div>
+      <div class="codewrap">
+        <pre><span class="c"># Plugins → Updates, in wp-admin</span>
+<span class="k">Awesome Plugin</span>
+  Installed: <span class="s2">1.4.0</span>  →  Available: <span class="s2">1.5.0</span>
+  <span class="p">[ View details ]   [ Update now ]</span>
+
+<span class="c"># ...served straight from your GitHub release.</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="wrap">
+    <p class="eyebrow">What you get</p>
+    <h2>Features</h2>
+    <p class="lede">A focused, dependency-light library that behaves exactly like a native WordPress update source.</p>
+    <div class="grid">
+      <div class="feat"><div class="dot">🔄</div><h3>Native update UX</h3><p>Update badge, "View details" modal, and one-click "Update now" — identical to a wp.org-hosted plugin.</p></div>
+      <div class="feat"><div class="dot">🔐</div><h3>Private &amp; org repos</h3><p>Public repos work anonymously. Private and organization repos authenticate with a Personal Access Token.</p></div>
+      <div class="feat"><div class="dot">🏷️</div><h3>Releases or tags</h3><p>Track GitHub <em>releases</em> (default) or fall back to <em>tags</em>. Optionally prefer an uploaded <code>.zip</code> asset over the source zipball.</p></div>
+      <div class="feat"><div class="dot">⚡</div><h3>Zero-config boot</h3><p>Add an <code>Update URI</code> header, call one line, and you're done. Or declare config once in <code>composer.json</code>.</p></div>
+      <div class="feat"><div class="dot">🧭</div><h3>Rate-limit friendly</h3><p>Responses are cached for 12 hours and revalidated with ETags, staying well under GitHub's anonymous limit.</p></div>
+      <div class="feat"><div class="dot">📦</div><h3>Folder-safe installs</h3><p>Renames GitHub's <code>owner-repo-&lt;hash&gt;/</code> archive folder to your real plugin slug so updates land cleanly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install">
+  <div class="wrap">
+    <p class="eyebrow">Get started</p>
+    <h2>Install &amp; boot in three steps</h2>
+    <p class="lede">Require the library, point it at your repository, boot from your main plugin file.</p>
+    <div class="steps" style="margin-bottom:28px">
+      <div class="step"><h3>Require it</h3><p>Add the Composer package to your plugin.</p></div>
+      <div class="step"><h3>Point at your repo</h3><p>Via a header, PHP config, or <code>composer.json</code>.</p></div>
+      <div class="step"><h3>Boot &amp; ship</h3><p>One line from your main file. Updates appear automatically.</p></div>
+    </div>
+    <div class="codewrap"><span class="lbl">terminal</span>
+<pre><span class="k">composer</span> require itzmekhokan/github-plugin-updater</pre>
+    </div>
+    <h3 style="margin:28px 0 10px;font-size:18px">Zero-config (header-driven)</h3>
+    <p style="color:var(--muted);margin-top:0">Add an <code>Update URI</code> header pointing at your repo, then boot from the main file:</p>
+    <div class="codewrap"><span class="lbl">awesome-plugin.php</span>
+<pre><span class="c">/**
+ * Plugin Name: Awesome Plugin
+ * Version:     1.4.0
+ * Update URI:  https://github.com/acme/awesome-plugin
+ */</span>
+
+require __DIR__ . <span class="s2">'/vendor/autoload.php'</span>;
+
+\Itzmekhokan\GitHubPluginUpdater\<span class="p">Bootstrap</span>::auto( __FILE__ );</pre>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIG -->
+<section id="config">
+  <div class="wrap">
+    <p class="eyebrow">Configuration</p>
+    <h2>Explicit config, your way</h2>
+    <p class="lede">Prefer to be explicit? Pass options in PHP, or declare them once in <code>composer.json</code> and keep calling <code>Bootstrap::auto()</code>.</p>
+    <div class="split">
+      <div class="codewrap"><span class="lbl">PHP</span>
+<pre>\Itzmekhokan\GitHubPluginUpdater\<span class="p">Bootstrap</span>::boot( __FILE__, [
+  <span class="s2">'repository'</span>        => <span class="s2">'acme/awesome-plugin'</span>,
+  <span class="s2">'source'</span>            => <span class="s2">'release'</span>, <span class="c">// or 'tag'</span>
+  <span class="s2">'prefer-asset'</span>      => <span class="k">true</span>,      <span class="c">// use uploaded .zip</span>
+  <span class="s2">'allow-prereleases'</span> => <span class="k">false</span>,
+  <span class="s2">'token'</span>             => <span class="s2">'env:GH_UPDATER_TOKEN'</span>,
+] );</pre>
+      </div>
+      <div class="codewrap"><span class="lbl">composer.json</span>
+<pre>{
+  <span class="s2">"extra"</span>: {
+    <span class="s2">"github-plugin-updater"</span>: {
+      <span class="s2">"repository"</span>:        <span class="s2">"acme/awesome-plugin"</span>,
+      <span class="s2">"source"</span>:            <span class="s2">"release"</span>,
+      <span class="s2">"prefer-asset"</span>:      <span class="k">true</span>,
+      <span class="s2">"allow-prereleases"</span>: <span class="k">false</span>,
+      <span class="s2">"token"</span>:             <span class="s2">"env:GH_UPDATER_TOKEN"</span>
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <table class="tbl" style="margin-top:22px">
+      <thead><tr><th>Option</th><th>Default</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>repository</code></td><td>—</td><td><code>owner/repo</code> on GitHub (inferred from the <code>Update URI</code> header when omitted).</td></tr>
+        <tr><td><code>source</code></td><td><code>release</code></td><td>Track GitHub releases, or set <code>tag</code> to track pushed tags.</td></tr>
+        <tr><td><code>prefer-asset</code></td><td><code>false</code></td><td>Prefer an uploaded release <code>.zip</code> asset over the auto-generated source zipball.</td></tr>
+        <tr><td><code>allow-prereleases</code></td><td><code>false</code></td><td>Offer draft/pre-release versions as updates.</td></tr>
+        <tr><td><code>token</code></td><td>—</td><td>Token <em>spec</em> for private repos (see below). Omit for public repos.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- PRIVATE -->
+<section id="private">
+  <div class="wrap">
+    <p class="eyebrow">Authentication</p>
+    <h2>Private &amp; organization repositories</h2>
+    <p class="lede">Provide a GitHub Personal Access Token with <code>repo</code> scope (or fine-grained <em>Contents: read</em>). The <code>token</code> value is a <strong>spec</strong> — where to read the token from, never the token itself in code.</p>
+    <table class="tbl">
+      <thead><tr><th>Spec</th><th>Reads from</th></tr></thead>
+      <tbody>
+        <tr><td><code>env:VAR</code></td><td>Environment variable <code>VAR</code></td></tr>
+        <tr><td><code>constant:NAME</code></td><td>PHP constant <code>NAME</code> (define it in <code>wp-config.php</code>)</td></tr>
+        <tr><td><code>option</code></td><td>A WordPress option (plain storage in v1.0 — see note)</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);margin-top:22px">If no per-plugin token is set, a global constant is used as a fallback — so a site owner can configure one token for every managed plugin at once:</p>
+    <div class="codewrap"><span class="lbl">wp-config.php</span>
+<pre><span class="c">// Fallback token for all managed plugins</span>
+define( <span class="s2">'GITHUB_PLUGIN_UPDATER_TOKEN'</span>, <span class="s2">'ghp_xxx'</span> );</pre>
+    </div>
+    <div class="note"><b>Note:</b> the <code>option</code> source stores the token as a plain option in v1.0. Prefer <code>env</code> / <code>constant</code> in production. Encrypted at-rest storage lands in v1.1.</div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="wrap">
+    <p class="eyebrow">Under the hood</p>
+    <h2>How it works</h2>
+    <p class="lede">Four WordPress hooks do all the work — no cron, no external service, no phone-home.</p>
+    <div class="grid">
+      <div class="feat"><div class="dot">📥</div><h3>pre_set_site_transient_update_plugins</h3><p>Injects the "update available" record so WordPress shows the badge and the version bump.</p></div>
+      <div class="feat"><div class="dot">📄</div><h3>plugins_api</h3><p>Serves the "View details" modal, rendering your GitHub release notes as the changelog.</p></div>
+      <div class="feat"><div class="dot">📁</div><h3>upgrader_source_selection</h3><p>Renames GitHub's <code>owner-repo-&lt;hash&gt;/</code> folder to your plugin slug so the update installs in place.</p></div>
+      <div class="feat"><div class="dot">🔑</div><h3>upgrader_pre_download</h3><p>Downloads private archives with the correct two-step auth dance — auth to the API host, dropped on the signed redirect.</p></div>
+    </div>
+    <p style="color:var(--muted);margin-top:24px">Every response is cached for <strong>12 hours</strong> and revalidated with <strong>ETags</strong>, so the checker stays comfortably under GitHub's 60 req/hr anonymous rate limit.</p>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="wrap">
+    <p class="eyebrow">What's next</p>
+    <h2>Roadmap</h2>
+    <p class="lede">Where github-plugin-updater is headed.</p>
+    <table class="tbl">
+      <thead><tr><th>Version</th><th>Status</th><th>Planned</th></tr></thead>
+      <tbody>
+        <tr><td><b>v1.0</b></td><td><span class="pill done">Shipped</span></td><td>Releases &amp; tags, public/private/org repos, native update UX, ETag caching.</td></tr>
+        <tr><td><b>v1.1</b></td><td><span class="pill plan">Planned</span></td><td>Encrypted token storage + settings UI, <code>wp gpu check</code> WP-CLI command, branch/prerelease tracking.</td></tr>
+        <tr><td><b>v1.2</b></td><td><span class="pill plan">Planned</span></td><td>Provider abstraction (GitLab, Bitbucket), release-asset checksum / attestation verification.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <h2 style="margin:0 0 6px">Give your GitHub plugin a wp.org update flow</h2>
+      <p>Require the package, add one line, and your users get one-click updates from the admin. Two-minute setup.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/itzmekhokan/github-plugin-updater">View on GitHub</a>
+        <a class="btn ghost" href="#install">Read the docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>github-plugin-updater</strong> · GPL-2.0-or-later · Requires PHP 7.4+ and WordPress 5.8+</p>
+    <p>Built by <a href="https://github.com/itzmekhokan">Khokan Sardar</a> · <a href="https://github.com/itzmekhokan/github-plugin-updater">Source</a> · <a href="https://packagist.org/packages/itzmekhokan/github-plugin-updater">Packagist</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
